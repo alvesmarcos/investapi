@@ -10,7 +10,7 @@ import(
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	api := router.PathPrefix("/api/v1").Subrouter()
-	
+
 	// router test
 	api.HandleFunc("/", Index)
 
@@ -18,6 +18,10 @@ func main() {
 	api.HandleFunc("/users", GetNameAllUsers)
 	api.HandleFunc("/user", GetUserAndPassword)
 	api.HandleFunc("/user/{id}", DelUser)
+
+	// routers report
+	api.HandleFunc("/reports", GetAllReports)
+	api.HandleFunc("/report", AddReport)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
