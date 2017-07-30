@@ -13,15 +13,18 @@ type Report struct {
 	Images	[]string	`bson:"images" json:"images"`
 }
 
+type Sample struct {
+	Id		uint32	`bson:"id" json:"id"`
+	Date	string	`bson:"date" json:"date"`
+	Value	string	`bson:"value" json:"value"`
+}
+
 type Indicator struct {
-	Id					uint32	`bson:"id" json:"id"`
-	Name				string	`bson:"name" json:"name"`
-	Description	string	`bson:"description" json:"description"`
-	Metric			string 	`bson:"metric" json:"metric"`
-	Status			string 	`bson:"status" json:"status"`
-	Date				string 	`bson:"date" json:"date"`
-	Samples			[]struct {
-		Date	string	`bson:"date" json:"date"`
-		Value	string	`bson:"value" json:"value"`
-	} `bson:"samples" json:"samples"`
+	Id					uint32		`bson:"id" json:"id"`
+	Name				string		`bson:"name" json:"name"`
+	Description	string		`bson:"description" json:"description"`
+	Metric			string 		`bson:"metric" json:"metric"`
+	Status			string 		`bson:"status" json:"status"`
+	Date				string 		`bson:"date" json:"date"`
+	Samples			[]Sample	`bson:"samples" json:"samples"`
 }
