@@ -23,6 +23,10 @@ func main() {
 	api.HandleFunc("/reports", GetAllReports)
 	api.HandleFunc("/report", AddReport)
 
+	// routers Indicator
+	api.HandleFunc("/indicators", GetAllIndicators)
+	api.HandleFunc("/indicator", AddIndicator)
+
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 

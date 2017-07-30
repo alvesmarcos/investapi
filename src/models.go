@@ -14,7 +14,6 @@ type Report struct {
 }
 
 type Sample struct {
-	Id		uint32	`bson:"id" json:"id"`
 	Date	string	`bson:"date" json:"date"`
 	Value	string	`bson:"value" json:"value"`
 }

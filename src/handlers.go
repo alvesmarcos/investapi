@@ -6,7 +6,7 @@ import(
 	"github.com/gorilla/mux"
 )
 
-// handlers user
+// HANDLERS USER
 
 func GetNameAllUsers(w http.ResponseWriter, r *http.Request) {
 	var users [2]User
@@ -57,7 +57,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handlers report
+// HANDLERS REPORT
 
 func GetAllReports(w http.ResponseWriter, r *http.Request) {
 	report := Report{ Id: 1, Title: "Semana Economica", Body: "Eh isso aí", Images: []string{"path1", "path2"}}
@@ -82,5 +82,41 @@ func AddReport(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(report); err != nil {
 		panic(report)
+	}
+}
+
+// HANDLERS INDICATOR
+
+func GetAllIndicators(w http.ResponseWriter, r *http.Request) {
+	indicator := Indicator{ Id: 1, Name: "IPCA", Description: "Nao eh aquilo", Metric: "%",
+													Status: "Subiu", Date: "02/03/2015", Samples: []Sample{ Sample{ Date: "02/32", Value: "32.32"},
+													Sample { Date: "01/01", Value: "100"} }}
+
+	// TODO
+	// indicators := database.GetIndicators()
+
+	if err := json.NewEncoder(w).Encode(indicator); err != nil {
+		panic(indicator)
+	}
+}
+
+func AddIndicator(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	query := r.URL.Query()
+
+	name, description, metric := query.Get("name"), query.Get("description"), query.Get("metric")
+	status, date, sample_date, sample_value := query.Get("status"), query.Get("date"), r.Form["sample-date"], r.Form["sample-value"]
+
+	indicator := Indicator{ Id: 0, Name: name, Description: description, Metric: metric,
+													Status: status, Date: date, Samples: make([]Sample, 2) }
+	indicator.Samples[0].Date = sample_date[0]
+	indicator.Samples[0].Value = sample_value[0]
+	indicator.Samples[1].Date = sample_date[1]
+	indicator.Samples[1].Value = sample_value[1]
+	// TODO
+	// response := database.SaveReport(indicator)
+
+	if err := json.NewEncoder(w).Encode(indicator); err != nil {
+		panic(indicator)
 	}
 }
