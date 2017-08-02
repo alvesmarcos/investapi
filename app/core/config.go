@@ -6,6 +6,6 @@ type Config struct {
 }
 
 func (c *Config) Fetch() {
-  c.DBConnection =  "host=localhost user=postgres dbname=sda sslmode=disable password=admin123"
+  c.DBConnection = "host=localhost user=postgres dbname=sda sslmode=disable password=admin123"
   c.DBTYPE = "postgres"
 }
