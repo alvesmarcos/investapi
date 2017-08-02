@@ -30,7 +30,7 @@ func (c *Controller) HandleError(err error, w http.ResponseWriter) bool {
   if err == nil {
     return false
   }
-  msg := map[string]string{
+  msg := map[string]string {
     "message": "An error occurred"
   }
   c.SendJSON(w, &msg, http.StatusInternalServerError)

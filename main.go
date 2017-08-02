@@ -2,35 +2,25 @@ package main
 
 import(
 	"fmt"
-	"log"
-	"net/http"
-	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
+	"github.com/jinzhu/gorm"
+	 _ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-func main() {
-	router := mux.NewRouter().StrictSlash(true)
-	api := router.PathPrefix("/api/v1").Subrouter()
-
-	// router test
-	api.HandleFunc("/", Index)
-
-	// routers users
-	api.HandleFunc("/users", GetNameAllUsers)
-	api.HandleFunc("/user", GetUserAndPassword)
-	api.HandleFunc("/user/{id}", DelUser)
-
-	// routers report
-	api.HandleFunc("/reports", GetAllReports)
-	api.HandleFunc("/report", AddReport)
-
-	// routers Indicator
-	api.HandleFunc("/indicators", GetAllIndicators)
-	api.HandleFunc("/indicator", AddIndicator)
-
-	log.Fatal(http.ListenAndServe(":8080", router))
+type User struct {
+  Id        uint32  `json:"id"`
+  Name      string  `json:"name"`
+  Password  string  `json:"name"`
 }
 
-// example function handle
-func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Welcome!")
+
+func main() {
+	db, err := gorm.Open("postgres", "host=localhost user=postgres dbname=sda sslmode=disable password=admin123")
+
+	if err != nil {
+		fmt.Printf("Works %v",err);
+	}
+	db.CreateTable(&User{})
+	 	defer db.Close()
+	// router test
 }
