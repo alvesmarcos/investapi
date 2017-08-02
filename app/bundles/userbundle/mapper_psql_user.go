@@ -1,8 +1,6 @@
 package userbundle
 
-import (
-	"github.com/jinzhu/gorm"
-)
+import "github.com/jinzhu/gorm"
 
 type UserMapperPSQL struct {
   db *gorm.DB
@@ -12,23 +10,24 @@ func NewUserMapperPSQL(db *gorm.DB) *UserMapperPSQL {
   return &UserMapperPSQL { db: db }
 }
 
-func (ump *UserMapperPSQL) GetAll() ([]User, error) {
+func (ump *UserMapperPSQL) FindAll() ([]string, error) {
 	var users []User
 
 	user := ump.db.Find(&users)
-	return users, nil
+	usernames := make([]string, len(users))
+
+	for i, u := range users {
+		usernames[i] = u.username
+	}
+	return usernames, nil
 }
 
-func (ump *UserMapperPSQL) CheckNameAndPasswdMatches(username, password string) (bool, error) {
+func (ump *UserMapperPSQL) FindUser(u *User) (User, error) {
 	var user User
 
-	ump.db.Where("username = ? and password = ?", username, password).First(&user)
+	ump.db.Where("username = ? and password = ?", u.username, u.password).First(&user)
 
-	if user.id == 0 {
-		return false, nil
-	} else {
-		return true, nil
-	}
+  return user, nil
 }
 
 func (ump *UserMapperPSQL) Insert(user *User) error {
