@@ -2,9 +2,6 @@ package main
 
 import(
 	"fmt"
-	_ "github.com/lib/pq"
-	"github.com/jinzhu/gorm"
-	 _ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type User struct {
@@ -15,12 +12,6 @@ type User struct {
 
 
 func main() {
-	db, err := gorm.Open("postgres", "host=localhost user=postgres dbname=sda sslmode=disable password=admin123")
-
-	if err != nil {
-		fmt.Printf("Works %v",err);
-	}
-	db.CreateTable(&User{})
-	 	defer db.Close()
-	// router test
+	var user User
+	fmt.Printf("%v", user)
 }
