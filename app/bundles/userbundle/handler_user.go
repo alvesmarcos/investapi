@@ -3,43 +3,48 @@ package userbundle
 import(
   "net/http"
   "github.com/jinzhu/gorm"
+  "github.com/alvesmarcos/investapi/app/core"
 )
 
 type UserHandler struct {
   routes  []core.Route
 }
 
-func NewUserHandler(db *gorm.DB) UserHandler {
+func NewUserHandler(db *gorm.DB) *UserHandler {
   ump := NewUserMapperPSQL(db)
-  uc := NewUserController(ump)
+  uc := NewUserController(*ump)
 
   r := []core.Route {
     core.Route {
       Method:   http.MethodGet,
       Path:     "/users",
-      Handler:  uc.Index
+      Handler:  uc.Index,
     },
     core.Route {
       Method:   http.MethodGet,
       Path:     "/users",
-      Handler:  uc.Get
+      Handler:  uc.Get,
     },
     core.Route {
       Method:   http.MethodPost,
       Path:     "/users",
-      Handler:  uc.Create
+      Handler:  uc.Create,
     },
     core.Route {
       Method:   http.MethodDelete,
       Path:     "/users/{id}",
-      Handler:  uc.Delete
+      Handler:  uc.Delete,
     },
     core.Route {
       Method:   http.MethodPut,
       Path:     "/users/{id}",
-      Handler:  uc.Update
-    }
+      Handler:  uc.Update,
+    },
   }
 
   return &UserHandler { routes: r }
+}
+
+func (u *UserHandler) GetRoutes() []core.Route {
+  return u.routes
 }

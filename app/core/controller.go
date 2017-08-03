@@ -31,7 +31,7 @@ func (c *Controller) HandleError(err error, w http.ResponseWriter) bool {
     return false
   }
   msg := map[string]string {
-    "message": "An error occurred"
+    "message": "An error occurred",
   }
   c.SendJSON(w, &msg, http.StatusInternalServerError)
 
