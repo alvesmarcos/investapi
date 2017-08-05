@@ -1,12 +1,18 @@
 package reportbundle
 
 type Report struct {
-	Id     uint32		`json:"id"`
-	Title  string		`json:"title"`
-	Body   string		`json:"body"`
-	Images []string	`json:"images"`
+	Id			int				`gorm:"AUTO_INCREMENT" json:"id"`
+	Title		string		`gorm:"not null" json:"title"`
+	Body		string		`gorm:"not null" json:"body"`
+	Images	[]string	`gorm:"not null" json:"images"`
 }
 
-func NewReport(id uint32, title, body string, images []string) *Report {
-  return &Report { Id: id, Title: title, Body: body, Images: images }
+func NewReport(title, body string, images []string) *Report {
+  return &Report { Id: 0, Title: title, Body: body, Images: images }
+}
+
+func (r *Report) Copy(report *Report) {
+	r.Title = report.Title
+	r.Body = report.Body
+	r.Images = report.Images
 }
