@@ -22,13 +22,28 @@ func NewUserController(ump UserMapperPSQL) *UserController {
 }
 
 func (c *UserController) Index(w http.ResponseWriter, r *http.Request) {
-  users, err := c.ump.FindAll()
+  query := r.URL.Query()
 
-  if c.HandleError(err, w) {
-    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-    return
+  username, password := query.Get("username"), query.Get("password")
+
+  user := User { Username: username, Password: password }
+
+  if len(username) == 0 || len(password) == 0 {
+    users, err := c.ump.FindAll()
+
+    if err != nil {
+      c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+      return
+    }
+    c.SendJSON(w, &users, http.StatusOK)
+  } else {
+    userx, err := c.ump.FindUser(&user)
+    if err != nil {
+      c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+      return
+    }
+    c.SendJSON(w, &userx, http.StatusOK)
   }
-  c.SendJSON(w, &users, http.StatusOK)
 }
 
 func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
@@ -55,25 +70,23 @@ func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
   c.SendJSON(w, user, http.StatusOK)
 }
 
-func (c *UserController) Get(w http.ResponseWriter, r *http.Request) {
+func (c *UserController) GetById(w http.ResponseWriter, r *http.Request) {
   vars := mux.Vars(r)
-  query := r.URL.Query()
 
-  username, password := vars["username"], query.Get("password")
+  id, err := strconv.Atoi(vars["id"])
 
-  user := User { Username: username, Password: password }
-
-  if !user.Validate() {
+  if err != nil {
     c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
 
-  users, err := c.ump.FindUser(&user)
+  user, err := c.ump.FindUserById(id)
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    return
   }
 
-  c.SendJSON(w, &users, http.StatusOK)
+  c.SendJSON(w, &user, http.StatusOK)
 }
 
 func (c *UserController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -81,12 +94,12 @@ func (c *UserController) Delete(w http.ResponseWriter, r *http.Request) {
 
   id, err := strconv.Atoi(vars["id"])
 
-  if c.HandleError(err, w) {
+  if err != nil {
     c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
 
-  if c.HandleError(c.ump.Delete(id), w) {
+  if err = c.ump.Delete(id); err != nil {
     c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
@@ -106,13 +119,13 @@ func (c *UserController) Update(w http.ResponseWriter, r *http.Request) {
 
   id, err := strconv.Atoi(vars["id"])
 
-  if c.HandleError(err, w) {
+  if err != nil {
     c.SendJSON(w,  http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
   user := User { Id: id, Username: values.Get("username"), Password: values.Get("password") }
 
-  if c.HandleError(c.ump.Update(&user), w) {
+  if err = c.ump.Update(&user) ; err != nil {
     c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }

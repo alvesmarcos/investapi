@@ -22,8 +22,8 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
     },
     core.Route {
       Method:   http.MethodGet,
-      Path:     "/users/{username}",
-      Handler:  uc.Get,
+      Path:     "/users/{id}",
+      Handler:  uc.GetById,
     },
     core.Route {
       Method:   http.MethodPost,

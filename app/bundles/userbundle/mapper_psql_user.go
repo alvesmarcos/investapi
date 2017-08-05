@@ -13,23 +13,36 @@ func NewUserMapperPSQL(db *gorm.DB) *UserMapperPSQL {
 func (ump *UserMapperPSQL) FindAll() ([]User, error) {
   var users []User
 
-  ump.db.Find(&users)
+  err := ump.db.Find(&users).Error
   usersx := make([]User, len(users))
 
-  for i, u := range users {
-    usersx[i].Id = u.Id
-    usersx[i].Username = u.Username
-    usersx[i].Password =  "field value omitted"
-	}
-  return usersx, nil
+  if err == nil {
+    for i, u := range users {
+      usersx[i].Id = u.Id
+      usersx[i].Username = u.Username
+      usersx[i].Password =  "field value omitted"
+    }
+  }
+  return usersx, err
+}
+
+func (ump *UserMapperPSQL) FindUserById(id int) (User, error) {
+  var user User
+
+  err := ump.db.First(&user, id).Error
+
+  if err == nil {
+    user.Password = "field value omitted"
+  }
+  return user, err
 }
 
 func (ump *UserMapperPSQL) FindUser(u *User) (User, error) {
   var user User
 
-  ump.db.Where("username = ? and password = ?", u.Username, u.Password).First(&user)
+  err := ump.db.Where("username = ? and password = ?", u.Username, u.Password).First(&user).Error
 
-  return user, nil
+  return user, err
 }
 
 func (ump *UserMapperPSQL) Insert(user *User) error {
