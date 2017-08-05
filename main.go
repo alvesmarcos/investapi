@@ -4,6 +4,6 @@ import "github.com/alvesmarcos/investapi/app/server"
 
 
 func main() {
-	s := server.NewService()
+	s := server.NewServer()
 	s.Start()
 }
