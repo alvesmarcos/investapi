@@ -1,9 +1,9 @@
 package userbundle
 
 type User struct {
-  Id            int     `json:"id"`
-  Username      string  `json:"username"`
-  Password      string  `json:"password"`
+  Id            int     `gorm:"AUTO_INCREMENT" json:"id"`
+  Username      string  `gorm:"not null;unique" json:"username"`
+  Password      string  `gorm:"not null" json:"password"`
 }
 
 func NewUser(username string, password string) *User {

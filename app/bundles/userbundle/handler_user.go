@@ -22,7 +22,7 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
     },
     core.Route {
       Method:   http.MethodGet,
-      Path:     "/users",
+      Path:     "/users/{username}",
       Handler:  uc.Get,
     },
     core.Route {

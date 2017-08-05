@@ -10,16 +10,18 @@ func NewUserMapperPSQL(db *gorm.DB) *UserMapperPSQL {
   return &UserMapperPSQL { db: db }
 }
 
-func (ump *UserMapperPSQL) FindAll() ([]string, error) {
+func (ump *UserMapperPSQL) FindAll() ([]User, error) {
 	var users []User
 
 	ump.db.Find(&users)
-	usernames := make([]string, len(users))
+	usersx := make([]User, len(users))
 
 	for i, u := range users {
-		usernames[i] = u.Username
+    usersx[i].Id = u.Id
+		usersx[i].Username = u.Username
+    usersx[i].Password =  "field value omitted"
 	}
-	return usernames, nil
+	return usersx, nil
 }
 
 func (ump *UserMapperPSQL) FindUser(u *User) (User, error) {
@@ -41,8 +43,8 @@ func (ump *UserMapperPSQL) Delete(id int) error {
 func (ump *UserMapperPSQL) Update(user *User) error {
 	var u User
 
-	ump.db.Where("id = ?", user.Id).Find(&u)
+	ump.db.First(&u, user.Id)
 	u.Copy(user)
 
-	return ump.db.Update(&u).Error
+	return ump.db.Save(&u).Error
 }

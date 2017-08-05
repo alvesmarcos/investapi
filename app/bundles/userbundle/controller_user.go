@@ -2,6 +2,9 @@ package userbundle
 
 import(
   "errors"
+  "log"
+  "io/ioutil"
+  "net/url"
   "net/http"
 	"strconv"
 	"github.com/gorilla/mux"
@@ -37,18 +40,23 @@ func (c *UserController) Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
-  query := r.URL.Query()
+  body, err := ioutil.ReadAll(r.Body)
 
-  username, password := query.Get("username"), query.Get("password")
+  if err != nil {
+    c.SendJSON(w, nil, http.StatusInternalServerError)
+    return
+  }
 
-  user := User { Username: username, Password: password }
+  values, err := url.ParseQuery(string(body))
+
+  user := User { Username: values.Get("username"), Password: values.Get("password") }
 
   if !user.Validate() {
     c.SendJSON(w, ErrorInvalidUser, http.StatusBadRequest)
     return
   }
 
-  if err := c.ump.Insert(&user); err != nil {
+  if err = c.ump.Insert(&user); err != nil {
     c.SendJSON(w, nil, http.StatusInternalServerError)
     return
   }
@@ -56,9 +64,10 @@ func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *UserController) Get(w http.ResponseWriter, r *http.Request) {
+  vars := mux.Vars(r)
   query := r.URL.Query()
 
-  username, password := query.Get("username"), query.Get("password")
+  username, password := vars["username"], query.Get("password")
 
   user := User { Username: username, Password: password }
 
@@ -94,19 +103,24 @@ func (c *UserController) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (c *UserController) Update(w http.ResponseWriter, r *http.Request) {
   vars := mux.Vars(r)
-  query := r.URL.Query()
+  body, err := ioutil.ReadAll(r.Body)
 
-  username, password := query.Get("username"), query.Get("password")
+  if err != nil {
+    c.SendJSON(w, nil, http.StatusInternalServerError)
+    return
+  }
+
+  values, err := url.ParseQuery(string(body))
+
   id, err := strconv.Atoi(vars["id"])
-
-  user := User { Id: id, Username: username, Password: password }
 
   if c.HandleError(err, w) {
     c.SendJSON(w, ErrorInvalidId, http.StatusBadRequest)
     return
   }
-
-  if c.HandleError(c.ump.Update(&user), w) && !user.Validate() {
+  user := User { Id: id, Username: values.Get("username"), Password: values.Get("password") }
+    log.Println(user)
+  if c.HandleError(c.ump.Update(&user), w) {
     c.SendJSON(w, ErrorNotFound, http.StatusNotFound)
     return
   }
