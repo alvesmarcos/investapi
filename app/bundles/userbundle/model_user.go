@@ -21,3 +21,12 @@ func (user User) Validate() bool {
   }
   return true
 }
+
+func (user *User) CompareAndSwap(u User) {
+  if len(user.Username) != len(u.Username) && len(u.Username) > 0 {
+    user.Username = u.Username
+  }
+  if len(user.Password) != len(u.Password) && len(u.Password) > 0 {
+    user.Password = u.Password
+  }
+}

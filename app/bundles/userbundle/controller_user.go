@@ -64,7 +64,7 @@ func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
   }
 
   if err = c.ump.Insert(&user); err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    c.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)
     return
   }
   c.SendJSON(w, user, http.StatusOK)
@@ -114,19 +114,29 @@ func (c *UserController) Update(w http.ResponseWriter, r *http.Request) {
     c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
     return
   }
-
-  values, err := url.ParseQuery(string(body))
-
   id, err := strconv.Atoi(vars["id"])
 
   if err != nil {
     c.SendJSON(w,  http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
-  user := User { Id: id, Username: values.Get("username"), Password: values.Get("password") }
+  user, err := c.ump.FindUserById(id)
+
+  if err != nil {
+    c.SendJSON(w,  http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    return
+  }
+  values, err := url.ParseQuery(string(body))
+
+  if err != nil {
+    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    return
+  }
+
+  user.CompareAndSwap(User { Username: values.Get("username"), Password: values.Get("password") })
 
   if err = c.ump.Update(&user) ; err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    c.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)
     return
   }
   c.SendJSON(w, user, http.StatusOK)

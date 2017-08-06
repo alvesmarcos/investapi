@@ -54,10 +54,5 @@ func (ump *UserMapperPSQL) Delete(id int) error {
 }
 
 func (ump *UserMapperPSQL) Update(user *User) error {
-  var u User
-
-  ump.db.First(&u, user.Id)
-  u.Copy(user)
-
-  return ump.db.Save(&u).Error
+  return ump.db.Save(user).Error
 }
