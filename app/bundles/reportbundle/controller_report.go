@@ -4,8 +4,8 @@ import(
   "io/ioutil"
   "net/url"
   "net/http"
-	"strconv"
-	"github.com/gorilla/mux"
+  "strconv"
+  "github.com/gorilla/mux"
   "github.com/alvesmarcos/investapi/app/core"
 )
 
@@ -14,7 +14,7 @@ type ReportController struct {
   rmp ReportMapperPSQL
 }
 
-func NewReportMapperPSQL(rmp ReportMapperPSQL) *ReportMapperPSQL {
+func NewReportController(rmp ReportMapperPSQL) *ReportController {
   return &ReportController {
     Controller: core.Controller{},
     rmp:        rmp,
@@ -22,7 +22,7 @@ func NewReportMapperPSQL(rmp ReportMapperPSQL) *ReportMapperPSQL {
 }
 
 func (c *ReportController) Index(w http.ResponseWriter, r *http.Request) {
-  reports, err = c.rmp.FindAll()
+  reports, err := c.rmp.FindAll()
 
   if err != nil {
     c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -37,13 +37,13 @@ func (c *ReportController) GetById(w http.ResponseWriter, r *http.Request) {
   id, err := strconv.Atoi(vars["id"])
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.BadRequest), http.BadRequest)
+    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
   report, err := c.rmp.FindReportById(id)
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.NotFound), http.NotFound)
+    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
   c.SendJSON(w, &report, http.StatusOK)
@@ -59,7 +59,7 @@ func (c *ReportController) Create(w http.ResponseWriter, r *http.Request) {
 
   values, err := url.ParseQuery(string(body))
 
-  report = Report{ Title: values.Get("title"), Body: values.Get("body"), Images: values["images"]) }
+  report := Report{ Title: values.Get("title"), Body: values.Get("body"), Images: values["images"] }
 
   if !report.Validate() {
     c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -79,12 +79,12 @@ func (c *ReportController) Delete(w http.ResponseWriter, r *http.Request) {
   id, err := strconv.Atoi(vars["id"])
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.BadRequest), http.BadRequest)
+    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
 
   if err = c.rmp.Delete(id); err != nil {
-    c.SendJSON(w, http.StatusText(http.NotFound), http.NotFound)
+    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
   c.SendJSON(w, http.StatusText(http.StatusOK), http.StatusOK)
@@ -101,13 +101,13 @@ func (c *ReportController) Update(w http.ResponseWriter, r *http.Request) {
   id, err := strconv.Atoi(vars["id"])
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.BadRequest), http.BadRequest)
+    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
   report, err := c.rmp.FindReportById(id)
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.NotFound), http.NotFound)
+    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
   values, err := url.ParseQuery(string(body))

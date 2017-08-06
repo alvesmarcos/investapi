@@ -21,7 +21,7 @@ func (rmp *ReportMapperPSQL) FindAll() ([]Report, error) {
 func (rmp *ReportMapperPSQL) FindReportById(id int) (Report, error) {
   var report Report
 
-  err := rmp.db.Where("id = ?", id).First(&report)
+  err := rmp.db.Where("id = ?", id).First(&report).Error
 
   return report, err
 }

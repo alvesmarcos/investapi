@@ -6,7 +6,7 @@ type User struct {
   Password      string  `gorm:"not null" json:"password"`
 }
 
-func NewUser(username string, password string) *User {
+func NewUser(username, password string) *User {
   return &User { Id: 0, Username: username, Password: password }
 }
 
@@ -23,10 +23,10 @@ func (user User) Validate() bool {
 }
 
 func (user *User) CompareAndSwap(u User) {
-  if len(user.Username) != len(u.Username) && len(u.Username) > 0 {
+  if user.Username != u.Username && len(u.Username) > 0 {
     user.Username = u.Username
   }
-  if len(user.Password) != len(u.Password) && len(u.Password) > 0 {
+  if user.Password != u.Password && len(u.Password) > 0 {
     user.Password = u.Password
   }
 }

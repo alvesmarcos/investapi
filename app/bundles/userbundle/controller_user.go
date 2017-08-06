@@ -4,8 +4,8 @@ import(
   "io/ioutil"
   "net/url"
   "net/http"
-	"strconv"
-	"github.com/gorilla/mux"
+  "strconv"
+  "github.com/gorilla/mux"
   "github.com/alvesmarcos/investapi/app/core"
 )
 
