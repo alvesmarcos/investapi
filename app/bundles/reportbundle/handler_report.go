@@ -43,7 +43,7 @@ func NewReportHandler(db *gorm.DB) *ReportHandler {
     core.Route {
       Method:   http.MethodPut,
       Path:     "/reports/{id}/images",
-      Handler:  rc.Update,
+      Handler:  rc.UpdateImagesById,
     },
   }
   return &ReportHandler{ routes: r }

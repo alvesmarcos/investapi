@@ -1,6 +1,9 @@
 package reportbundle
 
-import "github.com/alvesmarcos/investapi/app/core"
+import (
+  "github.com/alvesmarcos/investapi/app/core"
+  "github.com/jinzhu/copier"
+)
 
 type Report struct {
   Id       int              `gorm:"AUTO_INCREMENT" json:"id"`
@@ -14,9 +17,7 @@ func NewReport(title, body string, images []string) *Report {
 }
 
 func (r *Report) Copy(report *Report) {
-  r.Title = report.Title
-  r.Body = report.Body
-  r.Images = report.Images
+  copier.Copy(r, report)
 }
 
 func (r Report) Validate() bool {

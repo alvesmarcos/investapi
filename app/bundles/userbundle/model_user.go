@@ -1,5 +1,7 @@
 package userbundle
 
+import "github.com/jinzhu/copier"
+
 type User struct {
   Id            int     `gorm:"AUTO_INCREMENT" json:"id"`
   Username      string  `gorm:"not null;unique" json:"username"`
@@ -11,8 +13,7 @@ func NewUser(username, password string) *User {
 }
 
 func (user *User) Copy(u *User) {
-  user.Username = u.Username
-  user.Password = u.Password
+  copier.Copy(user, u)
 }
 
 func (user User) Validate() bool {
