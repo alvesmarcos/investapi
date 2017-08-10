@@ -120,3 +120,45 @@ func (c *ReportController) Update(w http.ResponseWriter, r *http.Request) {
   }
   c.SendJSON(w, &report, http.StatusOK)
 }
+
+func (c *ReportController) UpdateImagesById(w http.ResponseWriter, r *http.Request) {
+  vars := mux.Vars(r)
+  body, err := ioutil.ReadAll(r.Body)
+
+  if err != nil {
+    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    return
+  }
+  id, err := strconv.Atoi(vars["id"])
+
+  report, err := c.rmp.FindReportById(id)
+
+  if err != nil {
+    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    return
+  }
+  values, err := url.ParseQuery(string(body))
+
+  if len(values.Get("path")) == 0 {
+    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+    return
+  }
+
+  if len(values.Get("index")) == 0 {
+    report.PushImage(values.Get("path"))
+  } else {
+    index, err := strconv.Atoi(values.Get("index"))
+
+    if err != nil {
+      c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+      return
+    }
+    report.UpdateImages(index, values.Get("path"))
+  }
+
+  if err = c.rmp.Update(&report) ; err != nil {
+    c.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+    return
+  }
+  c.SendJSON(w, &report, http.StatusOK)
+}

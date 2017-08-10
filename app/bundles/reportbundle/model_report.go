@@ -33,5 +33,12 @@ func (r *Report) CompareAndSwap(report Report) {
   if r.Body != report.Body && len(report.Body) > 0 {
     r.Body = report.Body
   }
-  // TODO teste array
+}
+
+func (r *Report) PushImage(path string) {
+  r.Images = append(r.Images, path)
+}
+
+func (r *Report) UpdateImages(index int, path string) {
+  r.Images[index] = path
 }
