@@ -50,5 +50,5 @@ func NewReportHandler(db *gorm.DB) *ReportHandler {
 }
 
 func (r *ReportHandler) GetRoutes() []core.Route {
-  return r.routes;
+  return r.routes
 }
