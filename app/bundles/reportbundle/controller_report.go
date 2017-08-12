@@ -67,7 +67,7 @@ func (c *ReportController) Create(w http.ResponseWriter, r *http.Request) {
   }
 
   if err = c.rmp.Insert(&report); err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
     return
   }
   c.SendJSON(w, &report, http.StatusOK)
@@ -112,7 +112,7 @@ func (c *ReportController) Update(w http.ResponseWriter, r *http.Request) {
   }
   values, err := url.ParseQuery(string(body))
 
-  report.CompareAndSwap(Report {Title: values.Get("title"), Body: values.Get("Body"), Images: values["images"]})
+  report.CompareAndSwap(Report {Title: values.Get("title"), Body: values.Get("Body") })
 
   if err = c.rmp.Update(&report) ; err != nil {
     c.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)

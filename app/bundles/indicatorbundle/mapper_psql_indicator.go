@@ -18,7 +18,7 @@ func (imp *IndicatorMapperPSQL) FindAll() ([]Indicator, error) {
   return indicators, err
 }
 
-func (imp *IndicatorMapperPSQL) FindReportById(id int) (Indicator, error) {
+func (imp *IndicatorMapperPSQL) FindIndicatorById(id int) (Indicator, error) {
   var indicator Indicator
 
   err := imp.db.Where("id = ?", id).First(&indicator).Error

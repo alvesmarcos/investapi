@@ -19,9 +19,16 @@ type Indicator struct {
 }
 
 func NewIndicator(id uint32, name, description, metric, status string, samples []Samples) *Indicator {
-  return &Indicator { Id: id, Name: name, Description: description, Metric: metric, Status: status, Samples: samples }
+  return &Indicator { Id: id, Name: name, Description: description, Metric: metric, Samples: samples, Status: status }
 }
 
 func (indicator *Indicator) Copy(i *Indicator) {
   copier.Copy(indicator, i)
+}
+
+func (indicator Indicator) Validate() bool {
+  if len(name) == 0 || len(description) == 0 || len(metric) == 0 || len(status) == 0 {
+    return false
+  }
+  return true
 }
