@@ -5,6 +5,7 @@ import(
   "net/http"
   "github.com/jinzhu/gorm"
   "github.com/gorilla/mux"
+  "github.com/gorilla/handlers"
   _ "github.com/jinzhu/gorm/dialects/postgres"
   "github.com/alvesmarcos/investapi/app/bundles/userbundle"
   "github.com/alvesmarcos/investapi/app/bundles/reportbundle"
@@ -42,7 +43,7 @@ func (s *Server) Start() error {
   }
 
   http.Handle("/", r)
-  log.Fatal(http.ListenAndServe(":8080", nil))
+  log.Fatal(http.ListenAndServe(":8080", handlers.CORS()(api)))
 
   return nil
 }
@@ -54,7 +55,6 @@ func initHandlers(db *gorm.DB) []core.Handler {
 func migrateModels(db *gorm.DB) {
   db.AutoMigrate(&userbundle.User{})
   db.AutoMigrate(&reportbundle.Report{})
-  //db.DropTable(&indicatorbundle.Indicator{}, &indicatorbundle.Sample{})
   db.AutoMigrate(&indicatorbundle.Indicator{}, &indicatorbundle.Sample{})
   // i := indicatorbundle.NewIndicator("IPCA", "Good Index", "%", "up")
   // db.Create(i)
