@@ -14,15 +14,15 @@ type IndicatorController struct {
   imp IndicatorMapperPSQL
 }
 
-func NewIndicatorController(imp IndicatorController) *IndicatorController {
+func NewIndicatorController(imp IndicatorMapperPSQL) *IndicatorController {
   return &IndicatorController{
     Controller: core.Controller{},
     imp:        imp,
   }
 }
 
-func (c *IndicatorController) Index(w http.ResponeWriter, r *http.Request) {
-  indicators, err := imp.FindAll()
+func (c *IndicatorController) Index(w http.ResponseWriter, r *http.Request) {
+  indicators, err := c.imp.FindAll()
 
   if err != nil {
     c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -32,7 +32,7 @@ func (c *IndicatorController) Index(w http.ResponeWriter, r *http.Request) {
 }
 
 func (c *IndicatorController) GetById(w http.ResponseWriter, r *http.Request) {
-  vars := mux.Vars()
+  vars := mux.Vars(r)
 
   id, err := strconv.Atoi(vars["id"])
 
@@ -40,7 +40,7 @@ func (c *IndicatorController) GetById(w http.ResponseWriter, r *http.Request) {
     c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
-  indicator, err := imp.FindIndicatorById(id)
+  indicator, err := c.imp.FindIndicatorById(id)
 
   if err != nil {
     c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -70,7 +70,7 @@ func (c *IndicatorController) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *IndicatorController) Delete(w http.ResponseWriter, r *http.Request) {
-  vars := mux.Vars()
+  vars := mux.Vars(r)
 
   id, err := strconv.Atoi(vars["id"])
 
@@ -79,7 +79,7 @@ func (c *IndicatorController) Delete(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  if err = imp.Delete(id); err != nil {
+  if err = c.imp.Delete(id); err != nil {
     c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
@@ -87,7 +87,7 @@ func (c *IndicatorController) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *IndicatorController) Update(w http.ResponseWriter, r *http.Request) {
-  vars := mux.vars()
+  vars := mux.Vars(r)
   body, err := ioutil.ReadAll(r.Body)
 
   id, err := strconv.Atoi(vars["id"])
@@ -106,7 +106,7 @@ func (c *IndicatorController) Update(w http.ResponseWriter, r *http.Request) {
 
   values, err := url.ParseQuery(string(body))
 
-  indicator := Indicator{ Name: values.Get("name"), Description: values.Get("description"), Metric: values.Get("metric"), Status: "equal"}
+  indicator.CompareAndSwap(Indicator{ Name: values.Get("name"), Description: values.Get("description"), Metric: values.Get("metric"), Status: values.Get("status")})
 
   if err = c.imp.Update(&indicator); err != nil {
     c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -117,7 +117,7 @@ func (c *IndicatorController) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *IndicatorController) UpdateSamples(w http.ResponseWriter, r *http.Request) {
-  vars := mux.vars()
+  vars := mux.Vars(r)
   body, err := ioutil.ReadAll(r.Body)
 
   id, err := strconv.Atoi(vars["id"])
@@ -136,12 +136,38 @@ func (c *IndicatorController) UpdateSamples(w http.ResponseWriter, r *http.Reque
 
   values, err := url.ParseQuery(string(body))
 
-  indicator := Indicator{ Name: values.Get("name"), Description: values.Get("description"), Metric: values.Get("metric"), Status: "equal"}
+  valuex, err := strconv.ParseFloat(values.Get("value"), 64)
 
-  if err = c.imp.Update(&indicator); err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+  if err != nil {
+    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
+  sample := Sample{ Date: values.Get("date"), Value: valuex, ReferIndicator: indicator.Id }
 
+  if len(values.Get("index")) == 0 {
+    indicator.PushSample(sample)
+
+    if err = c.imp.UpdatePushSample(&sample) ; err != nil {
+      c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+      return
+    }
+  } else {
+    index, err := strconv.Atoi(values.Get("index"))
+
+    if err != nil {
+      c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+      return
+    }
+    indicator.UpdateSamples(index, sample)
+
+    if len(sample.Date) == 0 {
+      sample.Date = indicator.Samples[index].Date
+    }
+
+    if err = c.imp.UpdateSample(&sample) ; err != nil {
+      c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+      return
+    }
+  }
   c.SendJSON(w, &indicator, http.StatusOK)
 }

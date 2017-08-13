@@ -1,10 +1,12 @@
+package indicatorbundle
+
 import(
   "net/http"
   "github.com/jinzhu/gorm"
   "github.com/alvesmarcos/investapi/app/core"
 )
 
-type ReportHandler struct {
+type IndicatorHandler struct {
   routes []core.Route
 }
 
@@ -41,10 +43,10 @@ func NewIndicatorHandler(db *gorm.DB) *IndicatorHandler {
     core.Route {
       Method:   http.MethodPut,
       Path:     "/indicators/{id}/samples",
-      Handler:  ic.Update,
+      Handler:  ic.UpdateSamples,
     },
   }
-  return &IndicatorHandler{ routes: r}
+  return &IndicatorHandler{ routes: r }
 }
 
 func (i *IndicatorHandler) GetRoutes() []core.Route {

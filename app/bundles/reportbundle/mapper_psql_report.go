@@ -35,10 +35,5 @@ func (rmp *ReportMapperPSQL) Delete(id int) error {
 }
 
 func (rmp *ReportMapperPSQL) Update(report *Report) error {
-  var r Report
-
-  rmp.db.First(&r, report.Id)
-  r.Copy(report)
-
-  return rmp.db.Save(&r).Error
+  return rmp.db.Save(&report).Error
 }

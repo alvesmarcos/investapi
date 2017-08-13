@@ -8,6 +8,7 @@ import(
   _ "github.com/jinzhu/gorm/dialects/postgres"
   "github.com/alvesmarcos/investapi/app/bundles/userbundle"
   "github.com/alvesmarcos/investapi/app/bundles/reportbundle"
+  "github.com/alvesmarcos/investapi/app/bundles/indicatorbundle"
   "github.com/alvesmarcos/investapi/app/core"
 )
 
@@ -47,13 +48,16 @@ func (s *Server) Start() error {
 }
 
 func initHandlers(db *gorm.DB) []core.Handler {
-  return []core.Handler{ userbundle.NewUserHandler(db), reportbundle.NewReportHandler(db) }
+  return []core.Handler{ userbundle.NewUserHandler(db), reportbundle.NewReportHandler(db), indicatorbundle.NewIndicatorHandler(db) }
 }
 
 func migrateModels(db *gorm.DB) {
   db.AutoMigrate(&userbundle.User{})
   db.AutoMigrate(&reportbundle.Report{})
-
+  //db.DropTable(&indicatorbundle.Indicator{}, &indicatorbundle.Sample{})
+  db.AutoMigrate(&indicatorbundle.Indicator{}, &indicatorbundle.Sample{})
+  // i := indicatorbundle.NewIndicator("IPCA", "Good Index", "%", "up")
+  // db.Create(i)
   //db.Create(reportbundle.NewReport("Semana 30", "Giro Pela Bolsa", []string {"Slide1.JPG", "Slide2.JPG", "Slide3.JPG", "Slide4.JPG", "Slide5.JPG"}))
   // db.Create(userbundle.NewUser("Marcos", "admin123"))
   // db.Create(userbundle.NewUser("SDA_API", "09212"))
