@@ -58,7 +58,12 @@ func (imp *IndicatorMapperPSQL) Insert(indicator *Indicator) error {
 
 
 func (imp *IndicatorMapperPSQL) Delete(id int) error {
-  return imp.db.Delete(&Indicator{ Id: id }).Error
+  err := imp.db.Delete(&Indicator{ Id: id }).Error
+
+  if err != nil {
+    return err
+  }
+  return imp.db.Where("refer_indicator = ?", id).Delete(&Sample{}).Error
 }
 
 

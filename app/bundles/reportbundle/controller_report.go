@@ -10,25 +10,21 @@ import(
 )
 
 type ReportController struct {
-  core.Controller
   rmp ReportMapperPSQL
 }
 
 func NewReportController(rmp ReportMapperPSQL) *ReportController {
-  return &ReportController {
-    Controller: core.Controller{},
-    rmp:        rmp,
-  }
+  return &ReportController { rmp: rmp }
 }
 
 func (c *ReportController) Index(w http.ResponseWriter, r *http.Request) {
   reports, err := c.rmp.FindAll()
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
-  c.SendJSON(w, &reports, http.StatusOK)
+  core.SendJSON(w, &reports, http.StatusOK)
 }
 
 func (c *ReportController) GetById(w http.ResponseWriter, r *http.Request) {
@@ -37,23 +33,23 @@ func (c *ReportController) GetById(w http.ResponseWriter, r *http.Request) {
   id, err := strconv.Atoi(vars["id"])
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+    core.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
   report, err := c.rmp.FindReportById(id)
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
-  c.SendJSON(w, &report, http.StatusOK)
+  core.SendJSON(w, &report, http.StatusOK)
 }
 
 func (c *ReportController) Create(w http.ResponseWriter, r *http.Request) {
   body, err := ioutil.ReadAll(r.Body)
 
   if err != nil {
-    c.SendJSON(w,  http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    core.SendJSON(w,  http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
     return
   }
 
@@ -62,15 +58,15 @@ func (c *ReportController) Create(w http.ResponseWriter, r *http.Request) {
   report := Report{ Title: values.Get("title"), Body: values.Get("body"), Images: values["images"] }
 
   if !report.Validate() {
-    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+    core.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
 
   if err = c.rmp.Insert(&report); err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    core.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
     return
   }
-  c.SendJSON(w, &report, http.StatusOK)
+  core.SendJSON(w, &report, http.StatusOK)
 }
 
 func (c *ReportController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -79,15 +75,15 @@ func (c *ReportController) Delete(w http.ResponseWriter, r *http.Request) {
   id, err := strconv.Atoi(vars["id"])
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+    core.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
 
   if err = c.rmp.Delete(id); err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
-  c.SendJSON(w, http.StatusText(http.StatusOK), http.StatusOK)
+  core.SendJSON(w, http.StatusText(http.StatusOK), http.StatusOK)
 }
 
 func (c *ReportController) Update(w http.ResponseWriter, r *http.Request) {
@@ -95,19 +91,19 @@ func (c *ReportController) Update(w http.ResponseWriter, r *http.Request) {
   body, err := ioutil.ReadAll(r.Body)
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    core.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
     return
   }
   id, err := strconv.Atoi(vars["id"])
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+    core.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
   report, err := c.rmp.FindReportById(id)
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
   values, err := url.ParseQuery(string(body))
@@ -115,10 +111,10 @@ func (c *ReportController) Update(w http.ResponseWriter, r *http.Request) {
   report.CompareAndSwap(Report {Title: values.Get("title"), Body: values.Get("Body") })
 
   if err = c.rmp.Update(&report) ; err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+    core.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)
     return
   }
-  c.SendJSON(w, &report, http.StatusOK)
+  core.SendJSON(w, &report, http.StatusOK)
 }
 
 func (c *ReportController) UpdateImagesById(w http.ResponseWriter, r *http.Request) {
@@ -126,7 +122,7 @@ func (c *ReportController) UpdateImagesById(w http.ResponseWriter, r *http.Reque
   body, err := ioutil.ReadAll(r.Body)
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    core.SendJSON(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
     return
   }
   id, err := strconv.Atoi(vars["id"])
@@ -134,13 +130,13 @@ func (c *ReportController) UpdateImagesById(w http.ResponseWriter, r *http.Reque
   report, err := c.rmp.FindReportById(id)
 
   if err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
     return
   }
   values, err := url.ParseQuery(string(body))
 
   if len(values.Get("path")) == 0 {
-    c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+    core.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
     return
   }
 
@@ -150,15 +146,15 @@ func (c *ReportController) UpdateImagesById(w http.ResponseWriter, r *http.Reque
     index, err := strconv.Atoi(values.Get("index"))
 
     if err != nil {
-      c.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+      core.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
       return
     }
     report.UpdateImages(index, values.Get("path"))
   }
 
   if err = c.rmp.Update(&report) ; err != nil {
-    c.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+    core.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)
     return
   }
-  c.SendJSON(w, &report, http.StatusOK)
+  core.SendJSON(w, &report, http.StatusOK)
 }
