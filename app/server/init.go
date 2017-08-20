@@ -56,9 +56,4 @@ func migrateModels(db *gorm.DB) {
   db.AutoMigrate(&userbundle.User{})
   db.AutoMigrate(&reportbundle.Report{})
   db.AutoMigrate(&indicatorbundle.Indicator{}, &indicatorbundle.Sample{})
-  // i := indicatorbundle.NewIndicator("IPCA", "Good Index", "%", "up")
-  // db.Create(i)
-  //db.Create(reportbundle.NewReport("Semana 30", "Giro Pela Bolsa", []string {"Slide1.JPG", "Slide2.JPG", "Slide3.JPG", "Slide4.JPG", "Slide5.JPG"}))
-  // db.Create(userbundle.NewUser("Marcos", "admin123"))
-  // db.Create(userbundle.NewUser("SDA_API", "09212"))
 }

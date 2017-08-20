@@ -18,28 +18,33 @@ func NewUserController(ump UserMapperPSQL) *UserController {
 }
 
 func (c *UserController) Index(w http.ResponseWriter, r *http.Request) {
+  users, err := c.ump.FindAll()
+
+  if err != nil {
+    core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    return
+  }
+  core.SendJSON(w, &users, http.StatusOK)
+}
+
+func (c *UserController) Login(w http.ResponseWriter, r *http.Request) {
   query := r.URL.Query()
 
   username, password := query.Get("username"), query.Get("password")
 
+  if len(username) == 0 || len(password) == 0 {
+    core.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+    return
+  }
   user := User { Username: username, Password: password }
 
-  if len(username) == 0 || len(password) == 0 {
-    users, err := c.ump.FindAll()
+  userx, err := c.ump.FindUser(&user)
 
-    if err != nil {
-      core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-      return
-    }
-    core.SendJSON(w, &users, http.StatusOK)
-  } else {
-    userx, err := c.ump.FindUser(&user)
-    if err != nil {
-      core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-      return
-    }
-    core.SendJSON(w, &userx, http.StatusOK)
+  if err != nil {
+    core.SendJSON(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+    return
   }
+  core.SendJSON(w, &userx, http.StatusOK)
 }
 
 func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
