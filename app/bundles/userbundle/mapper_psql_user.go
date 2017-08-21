@@ -19,6 +19,7 @@ func (ump *UserMapperPSQL) FindAll() ([]User, error) {
   if err == nil {
     for i, u := range users {
       usersx[i].Id = u.Id
+      usersx[i].Name = u.Name
       usersx[i].Username = u.Username
       usersx[i].Password =  "field value omitted"
     }
