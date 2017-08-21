@@ -57,7 +57,7 @@ func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
 
   values, err := url.ParseQuery(string(body))
 
-  user := User { Name: values.Get("name") Username: values.Get("username"), Password: values.Get("password") }
+  user := User { Name: values.Get("name"), Username: values.Get("username"), Password: values.Get("password") }
 
   if !user.Validate() {
     core.SendJSON(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -134,7 +134,7 @@ func (c *UserController) Update(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  user.CompareAndSwap(User { Name: values.Get("name") Username: values.Get("username"), Password: values.Get("password") })
+  user.CompareAndSwap(User { Name: values.Get("name"), Username: values.Get("username"), Password: values.Get("password") })
 
   if err = c.ump.Update(&user) ; err != nil {
     core.SendJSON(w, http.StatusText(http.StatusConflict), http.StatusConflict)

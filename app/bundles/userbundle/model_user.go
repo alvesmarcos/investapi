@@ -18,7 +18,7 @@ func (user *User) Copy(u *User) {
 }
 
 func (user User) Validate() bool {
-  if len(user.Username) == 0 || len(user.Password) == 0 len(user.Name) == 0 {
+  if len(user.Username) == 0 || len(user.Password) == 0 || len(user.Name) == 0 {
     return false
   }
   return true
